@@ -89,4 +89,31 @@ class EpisodeListViewModelTest {
 
         assert(isError)
     }
+
+    //測試fetchEpisodes執行function的流程
+    @Test
+    fun fetchEpisodesFlow() = runBlocking {
+        every { databaseRepository.clearAllDatabaseTables() } returns flowOf(true)
+        every { episodeListRepository.fetchEpisodes() } returns flowOf(rss)
+        every { databaseRepository.insertEpisodes(rss.channel.items) } returns flowOf(true)
+
+        episodeListUseCase.fetchEpisodes()
+            .collect()
+
+        verifySequence {
+            databaseRepository.clearAllDatabaseTables()
+            episodeListRepository.fetchEpisodes()
+            databaseRepository.insertEpisodes(rss.channel.items)
+        }
+    }
+
+    @Test
+    fun fetchEpisodeContent() = runBlocking {
+        every {databaseRepository.clearAllDatabaseTables()} returns flowOf(true)
+        every {databaseRepository.insertEpisodes(rss.channel.items)} returns flowOf(true)
+
+        episodeListUseCase.fetchEpisodes().collect {
+
+        }
+    }
 }
